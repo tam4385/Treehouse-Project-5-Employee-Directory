@@ -1,15 +1,18 @@
 
 //variable to contain the data from the fetch
 let fetchData;
+let modalNext;
 
-//building the search form html
+//===============building the search form html==================
+//creating the form
 const searchContainer = document.querySelector('.search-container');
 const form = document.createElement('form');
-
+//adding attributes to the form
 form.action = "#";
 form.method = "get"
 //create elements inside the form
 const searchInput = document.createElement('input');
+//creating attributes of input
 searchInput.type = "search";
 searchInput.id = 'search-input';
 searchInput.className = 'search-input';
@@ -26,25 +29,8 @@ searchContainer.appendChild(form);
 form.appendChild(searchInput);
 form.appendChild(searchSubmit);
 
-//search bar functionality
-searchInput.addEventListener('keyup', () => {
-    const cards = document.querySelectorAll('.card')
-    console.log(cards)
-        cards.forEach(card => {
-            let parent = card.parentElement
-            parent.removeChild(card);
-            //loop through fetch results and add condition to match names of fetch results
-            fetchData.results.forEach(result => {
-                if (searchInput.value === result.name.first 
-                    || searchInput.value === result.name.last) {
-                    generateGallery(result);
-                } else {
-                  console.log('else')  
-                }
-            });
-    });
-});
-//Fetching the api data
+
+//================Fetching the api data=================================
 fetch('https://randomuser.me/api/?results=12')
     .then(res => res.json())
     // .then(data => console.log(data.results))
@@ -54,7 +40,7 @@ fetch('https://randomuser.me/api/?results=12')
                          
 //=============helper functions==============================
 
-//gallery div generation
+//--------------gallery div generation
 const galleryDiv = document.getElementById('gallery');
 //function to add html and response text to the gallery div
 generateGallery = (data) => {
@@ -76,14 +62,15 @@ generateGallery = (data) => {
 
 }
 
+//-------------function to generate modal html----------------------
 const modalWindow = document.createElement('div');
 modalWindow.className = 'modal';
-//function to generate modal html
+
 generateModal = (user) => {
     let body = document.querySelector('body');
     const modalWindow = document.createElement('div');
     modalWindow.className = 'modal';
-    let html = `<div class="modal-container">
+    let html = `<div class="modal-container" id="${user.name.first} ${user.name.last}">
                 <div class="modal">
                     <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
                     <div class="modal-info-container">
@@ -97,10 +84,20 @@ generateModal = (user) => {
                         <p class="modal-text">Birthday: ${user.dob.date}, age ${user.dob.age}</p>
                     </div>
                 </div>
-                `;
+                <div class="modal-btn-container">
+                    <button type="button" id="modal-prev" class="modal-prev btn">Prev</button>
+                    <button type="button" id="modal-next" class="modal-next btn">Next</button>
+                </div>
+            </div>
+                `
+                ;
     modalWindow.innerHTML = html;
     body.appendChild(modalWindow);
-//adding event listener to the close button
+
+
+//===================Event Listeners=========================
+
+//--------------Event listener- Modal Close Butto----------------
 const close = document.getElementById('modal-close-btn')
     close.addEventListener('click', (e) => {
         if (e.target.className === 'modal-close-btn' || e.target.textContent === 'X') {
@@ -109,9 +106,8 @@ const close = document.getElementById('modal-close-btn')
     });
 } 
 
-//Event listener for the modal window
+//--------------Event Listener to create modal---------------
 const profileCards = document.querySelector('#gallery');
-
 profileCards.addEventListener('click', (e) => {
     const resultUsers = fetchData.results
     resultUsers.map(user => {
@@ -121,4 +117,72 @@ profileCards.addEventListener('click', (e) => {
     })
 });
 
+//----------------search bar functionality--------------------
+searchInput.addEventListener('keyup', () => {
+    const cards = document.querySelectorAll('.card')
+    let input = searchInput.value.toLocaleLowerCase();
+        cards.forEach(card => {
+             if (input === card.id) {
+                 card.style.display = 'block'
+             } else {
+                 card.style.display = 'none';
+             }
+            
+        });
+});
 
+//---------------Modal next button---------------------------
+modalNext = document.querySelector('#modal-next') 
+let body = document.querySelector('body');
+body.addEventListener('click', (e) => {
+    modalNext = document.querySelector('#modal-next')
+    if (e.target === modalNext) {
+        let currentModal = document.querySelector('.modal-container');
+        let galleryCards = document.querySelectorAll('.card'); 
+        //find current gallery card
+        galleryCards.forEach(card => {
+            if (card.id === currentModal.id) {
+    //find next gallery card        
+            let nextCard = card.nextElementSibling;
+            fetchData.results.forEach(result => {
+                if(nextCard.id === `${result.name.first} ${result.name.last}`) {
+                      let nextProfileData = result;
+                      let modalParent = currentModal.parentElement;
+                      let modalDiv = document.querySelector('modal'); 
+                      body.removeChild(modalParent)
+                      generateModal(nextProfileData);
+                }
+            });
+        }
+    });
+}
+});
+//---------------Modal Previous button----------------------------
+body.addEventListener('click', (e) => {
+    modalPrev = document.querySelector('#modal-prev')
+    if (e.target === modalPrev) {
+        let currentModal = document.querySelector('.modal-container');
+        let galleryCards = document.querySelectorAll('.card'); 
+        //find current gallery card
+        galleryCards.forEach(card => {
+            if (card.id === currentModal.id) {
+    //find prev gallery card        
+            let prevCard = card.previousElementSibling;
+            fetchData.results.forEach(result => {
+                if(prevCard.id === `${result.name.first} ${result.name.last}`) {
+                      let prevProfileData = result;
+                      let modalParent = currentModal.parentElement;
+                      modalParent.removeChild(currentModal);
+                      let modalDiv = document.querySelector('.modal')
+                      console.log(modalDiv)
+                      body.removeChild(modalDiv)
+                      generateModal(prevProfileData);
+                }
+            });
+        }
+    });
+}
+});
+body.addEventListener('click', (e) => {
+    console.log(e.target)
+})

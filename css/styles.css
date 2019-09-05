@@ -93,8 +93,8 @@ header h1 {
     transition: .4s ease-out;
     overflow: hidden;
     
+    
 }
-
 .card-img {
     width: 95px;
     margin: 10px 15px auto 10px;
@@ -212,8 +212,10 @@ header h1 {
     transition: .4s ease-out;
     outline: none;
   }
+  .card-img-container {
+      pointer-events: none;
+  }
   
-
 /* ===================================== 
    Media Queries
 ======================================== */
