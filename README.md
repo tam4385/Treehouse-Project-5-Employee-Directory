@@ -1,3 +1,6 @@
+
+Description: A fictional employee database that fetches data from an api renders it to the DOM. The employees are searchable and can also navigate through employees via a modal window.
+
 ## Welcome to GitHub Pages
 
 You can use the [editor on GitHub](https://github.com/tam4385/Treehouse-Project-5-Employee-Directory/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
